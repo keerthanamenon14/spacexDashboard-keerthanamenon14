@@ -1,4 +1,5 @@
-import React,{useEffect} from 'react';
+import React,{useState,useEffect} from 'react';
+import Grid from '@material-ui/core/Grid'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -9,12 +10,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import {getLaunchDetails} from '../_redux/_actions/LaunchDetailsActions'
-import { useState } from 'react';
+import FooterPagination from './FooterPagination'
 
 const useStyles = makeStyles({
   table: {
-    minWidth: 200,
-    borderStyle: 'solid'
+    width: '100%'
   },
 });
 
@@ -22,15 +22,43 @@ export default function LaunchDetails() {
   const classes = useStyles();
   const dispatch = useDispatch()
   const launchDetailsInfo = useSelector(
-    (state) => state.launchdetails
-  )
-  const launchDetails = launchDetailsInfo.data;
-  console.log(launchDetailsInfo)
+      (state) => state.launchdetails.data
+    )
+  const [launchDetails, setLaunchDetails] = useState()
+  const [page, setPage] = useState(1)
+  const [rulesPerPage] = useState(12)
+  const [currentPage, setcurrentPage] = useState(1)
+  const [launchCount, setLaunchCount] = useState()
+  const [currentDetail, setCurrentDetail] = useState("")
+
+  //setting current page
+  const paginate = (pageNumber) => {
+      setcurrentPage(pageNumber);
+  };
+
+  const handleChange = (event, value) => {
+      setPage(value);
+      paginate(value);
+  };
+
   useEffect(()=>{
     dispatch(getLaunchDetails())
   },[])
 
+  useEffect(()=>{
+    setLaunchDetails(launchDetailsInfo);
+    setLaunchCount(launchDetailsInfo.length)
+  },[launchDetailsInfo])
+
+  useEffect(() => {
+    const indexOfLastRule = currentPage * rulesPerPage;
+    const indexOfFirstRule = indexOfLastRule - rulesPerPage;
+    setCurrentDetail(launchDetailsInfo.slice(indexOfFirstRule, indexOfLastRule));
+  }, [launchDetailsInfo, currentPage]);
+
   return (
+    <Grid container direction="column">
+    <Grid item>
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
@@ -45,21 +73,32 @@ export default function LaunchDetails() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {launchDetails && launchDetails.map((row) => (
-            <TableRow key={row.flight_number}>
+          {currentDetail && currentDetail.map((row) => (
+            <TableRow >
               <TableCell align="right">{row.flight_number}</TableCell>
               <TableCell component="th" scope="row">
                 {row.launch_date_utc}
               </TableCell>
               <TableCell align="right">{row.launch_site.site_name}</TableCell>
               <TableCell align="right">{row.mission_name}</TableCell>
-              <TableCell align="right">{row.rocket.second_stage.orbit}</TableCell>
+              <TableCell align="right">{row.rocket.second_stage.payloads[0].orbit}</TableCell>
               <TableCell align="right">{row.launch_success}</TableCell>
               <TableCell align="right">{row.rocket.rocket_name}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </TableContainer>
+     </TableContainer>
+    </Grid>
+    <Grid item>
+        <FooterPagination
+          page={page}
+          handleChange={handleChange}
+          rulesPerPage={rulesPerPage}
+          totalRules={launchCount}
+          paginate={paginate}
+        />
+    </Grid>
+    </Grid>
   );
 }
