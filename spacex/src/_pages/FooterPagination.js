@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) => ({
   },
   pagination: {
     marginBottom: "50px",
-    marginRight: "30px",
     marginTop: "30px",
   },
 }));

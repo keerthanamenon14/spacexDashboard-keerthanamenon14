@@ -14,8 +14,19 @@ import FooterPagination from './FooterPagination'
 
 const useStyles = makeStyles({
   table: {
-    width: '100%'
+    width: '100%',
   },
+  detailsTable:{
+    paddingRight: '100px',
+    paddingLeft: '100px'
+  },
+  paginationItem:{
+      paddingRight: '100px'
+  },
+  tableData:{
+      textAlign:'center',
+      borderBottom:'none'
+  }
 });
 
 export default function LaunchDetails() {
@@ -58,39 +69,39 @@ export default function LaunchDetails() {
 
   return (
     <Grid container direction="column">
-    <Grid item>
+    <Grid item className={classes.detailsTable}>
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
-          <TableRow>
-            <TableCell>No:</TableCell>
-            <TableCell align="right">Launched(UTC)</TableCell>
-            <TableCell align="right">Location</TableCell>
-            <TableCell align="right">Mission</TableCell>
-            <TableCell align="right">Orbit</TableCell>
-            <TableCell align="right">Launch Status</TableCell>
-            <TableCell align="right">Rocket</TableCell>
+          <TableRow style={{backgroundColor:'#e0f7fa'}}>
+            <TableCell className={classes.tableData} >No:</TableCell>
+            <TableCell className={classes.tableData}>Launched(UTC)</TableCell>
+            <TableCell className={classes.tableData}>Location</TableCell>
+            <TableCell className={classes.tableData}>Mission</TableCell>
+            <TableCell className={classes.tableData}>Orbit</TableCell>
+            <TableCell className={classes.tableData}>Launch Status</TableCell>
+            <TableCell className={classes.tableData}>Rocket</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {currentDetail && currentDetail.map((row) => (
-            <TableRow >
-              <TableCell align="right">{row.flight_number}</TableCell>
-              <TableCell component="th" scope="row">
+            <TableRow  >
+              <TableCell className={classes.tableData}>{row.flight_number}</TableCell>
+              <TableCell className={classes.tableData} component="th" scope="row">
                 {row.launch_date_utc}
               </TableCell>
-              <TableCell align="right">{row.launch_site.site_name}</TableCell>
-              <TableCell align="right">{row.mission_name}</TableCell>
-              <TableCell align="right">{row.rocket.second_stage.payloads[0].orbit}</TableCell>
-              <TableCell align="right">{row.launch_success}</TableCell>
-              <TableCell align="right">{row.rocket.rocket_name}</TableCell>
+              <TableCell className={classes.tableData}>{row.launch_site.site_name}</TableCell>
+              <TableCell className={classes.tableData}>{row.mission_name}</TableCell>
+              <TableCell className={classes.tableData}>{row.rocket.second_stage.payloads[0].orbit}</TableCell>
+              <TableCell className={classes.tableData}>{row.launch_success}</TableCell>
+              <TableCell className={classes.tableData}>{row.rocket.rocket_name}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
      </TableContainer>
     </Grid>
-    <Grid item>
+    <Grid item className={classes.paginationItem}>
         <FooterPagination
           page={page}
           handleChange={handleChange}
