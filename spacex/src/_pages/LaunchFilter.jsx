@@ -8,6 +8,7 @@ import SortIcon from '@material-ui/icons/Sort';
 import Select from '@material-ui/core/Select';
 import { ListItemIcon,ListItemText } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
+import LaunchDetails from '../_pages/LaunchDetails.jsx'
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -24,20 +25,40 @@ const useStyles = makeStyles((theme) => ({
 export default function LaunchFilter() {
     const classes= useStyles()
     const [options, setOptions] = useState('All Launches')
+
+    const handleChange = (event) => {
+      setOptions(event.target.value);
+    };
+
+    // useEffect(()=>{
+    //   console.log(options);
+    //   <LaunchDetails filterOption={options}/>
+    // },[options])
+
+    const menuList = ['All Launches','Upcoming Launches','Successful Launches','Failed Launches'];
+
     return(
     <Grid>
         <FormControl className={classes.formControl}>
          {/* <SortIcon className={classes.label}/> */}
-         <InputLabel id="launch_filter_label" className={classes.label}>{options}</InputLabel>
+         {/* <InputLabel id="select-label">{options}</InputLabel> */}
          <Select
           labelId="select-label-for-launches"
           id="filterLaunches"
           disableUnderline={true}
           value={options}
+          onChange={(event)=>handleChange(event)}
+          MenuProps={{
+            anchorOrigin: {
+              vertical: "bottom",
+              horizontal: "left"
+            },
+            getContentAnchorEl: null
+          }}
         >
-          <MenuItem value={10} className={classes.menu}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
+          {menuList.map((item)=>
+            <MenuItem value={item}>{item}</MenuItem>
+          )}
         </Select>
         </FormControl>
     </Grid>

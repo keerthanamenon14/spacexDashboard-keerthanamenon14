@@ -10,7 +10,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import {getLaunchDetails} from '../_redux/_actions/LaunchDetailsActions'
+import LaunchDetailsModal from "../_pages/LaunchDetailsModal.jsx"
 import FooterPagination from './FooterPagination'
+import Chip from '@material-ui/core/Chip';
 
 const useStyles = makeStyles({
   table: {
@@ -24,12 +26,25 @@ const useStyles = makeStyles({
       paddingRight: '100px'
   },
   tableData:{
+      fontSize:'1rem',
       textAlign:'center',
       borderBottom:'none'
+  },
+  successChip:{
+    width:' 110px',
+    fontSize:'1rem',
+    color:'#1b5e20',
+    backgroundColor:'#e8f5e9'
+  },
+  failureChip:{
+    width:' 110px',
+    fontSize:'1rem',
+    color:'#e53935',
+    backgroundColor:'#ffebee'
   }
 });
 
-export default function LaunchDetails() {
+export default function LaunchDetails({filterOption}) {
   const classes = useStyles();
   const dispatch = useDispatch()
   const launchDetailsInfo = useSelector(
@@ -37,11 +52,13 @@ export default function LaunchDetails() {
     )
   const [launchDetails, setLaunchDetails] = useState()
   const [page, setPage] = useState(1)
-  const [rulesPerPage] = useState(12)
+  const [rulesPerPage] = useState(10)
   const [currentPage, setcurrentPage] = useState(1)
   const [launchCount, setLaunchCount] = useState()
   const [currentDetail, setCurrentDetail] = useState("")
+  const [openModal, setOpenModal] = useState(false)
 
+  console.log(filterOption)
   //setting current page
   const paginate = (pageNumber) => {
       setcurrentPage(pageNumber);
@@ -52,9 +69,26 @@ export default function LaunchDetails() {
       paginate(value);
   };
 
+  const handleClose=()=>{
+    setOpenModal(false)
+  }
+
+  const openDetailsModal =()=>{
+    setOpenModal(true);
+  }
+
   useEffect(()=>{
     dispatch(getLaunchDetails())
   },[])
+
+  useEffect(()=>{
+    if(filterOption==='Successful Launches')
+    {
+      var a = launchDetailsInfo.filter
+        ((item) => item.launch_success == true)
+      setCurrentDetail(a)
+    }
+  },[filterOption])
 
   useEffect(()=>{
     setLaunchDetails(launchDetailsInfo);
@@ -73,7 +107,7 @@ export default function LaunchDetails() {
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
-          <TableRow style={{backgroundColor:'#e0f7fa'}}>
+          <TableRow style={{backgroundColor:'#e1f5fe'}}>
             <TableCell className={classes.tableData} >No:</TableCell>
             <TableCell className={classes.tableData}>Launched(UTC)</TableCell>
             <TableCell className={classes.tableData}>Location</TableCell>
@@ -91,9 +125,19 @@ export default function LaunchDetails() {
                 {row.launch_date_utc}
               </TableCell>
               <TableCell className={classes.tableData}>{row.launch_site.site_name}</TableCell>
-              <TableCell className={classes.tableData}>{row.mission_name}</TableCell>
+              <TableCell className={classes.tableData} onClick={()=>openDetailsModal()}>
+              {row.mission_name}
+              </TableCell>
               <TableCell className={classes.tableData}>{row.rocket.second_stage.payloads[0].orbit}</TableCell>
-              <TableCell className={classes.tableData}>{row.launch_success}</TableCell>
+              {row.launch_success ?
+              <TableCell className={classes.tableData}>
+              <Chip  label="Success" className={classes.successChip}/>
+              </TableCell>
+              :
+              <TableCell className={classes.tableData}>
+              <Chip  label="Failure"  className={classes.failureChip}/>
+              </TableCell>
+              }
               <TableCell className={classes.tableData}>{row.rocket.rocket_name}</TableCell>
             </TableRow>
           ))}
@@ -110,6 +154,12 @@ export default function LaunchDetails() {
           paginate={paginate}
         />
     </Grid>
+    {openModal && (
+      <LaunchDetailsModal
+        open={openModal}
+        onClose={(e) => handleClose()}
+      />
+    )}
     </Grid>
   );
 }

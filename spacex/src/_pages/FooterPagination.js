@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
   totalRules
  }) {
   const classes = useStyles();
-  console.log(page,rulesPerPage,totalRules)
   return (
     <div className={classes.root}>
       <Grid container justify="flex-end">
