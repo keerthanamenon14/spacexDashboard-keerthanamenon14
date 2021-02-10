@@ -41,15 +41,27 @@ const useStyles = makeStyles({
     fontSize:'1rem',
     color:'#e53935',
     backgroundColor:'#ffebee'
+  },
+  upcomingChip:{
+    width:' 110px',
+    fontSize:'1rem',
+    color:'#f57c00',
+    backgroundColor:'#fff9c4'
   }
 });
 
-export default function LaunchDetails({filterOption}) {
+export default function LaunchDetails() {
   const classes = useStyles();
   const dispatch = useDispatch()
   const launchDetailsInfo = useSelector(
       (state) => state.launchdetails.data
-    )
+  )
+  const launchFilterOption = useSelector(
+      (state) => state.launchdetails.launchFilter
+  )
+  const dateFilterOption = useSelector(
+    (state) => state.launchdetails.dateFilter
+  ) 
   const [launchDetails, setLaunchDetails] = useState()
   const [page, setPage] = useState(1)
   const [rulesPerPage] = useState(10)
@@ -57,8 +69,8 @@ export default function LaunchDetails({filterOption}) {
   const [launchCount, setLaunchCount] = useState()
   const [currentDetail, setCurrentDetail] = useState("")
   const [openModal, setOpenModal] = useState(false)
+  const [rowDetails, setRowDetails] = useState("")
 
-  console.log(filterOption)
   //setting current page
   const paginate = (pageNumber) => {
       setcurrentPage(pageNumber);
@@ -73,22 +85,66 @@ export default function LaunchDetails({filterOption}) {
     setOpenModal(false)
   }
 
-  const openDetailsModal =()=>{
+  const openDetailsModal =(row)=>{
     setOpenModal(true);
+    setRowDetails(row);
   }
 
   useEffect(()=>{
     dispatch(getLaunchDetails())
   },[])
 
-  useEffect(()=>{
-    if(filterOption==='Successful Launches')
+  function convertDateToLocalDate (d){
+    // var date = new Date(str),
+    // mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+    // day = ("0" + date.getDate()).slice(-2);
+    // return [day,mnth,date.getFullYear()].join("-");
+    return d.getFullYear() + "-"+(d.getMonth()+1) +"-"+d.getDate() + ' '+d.toString().split(' ')[4];
+  }
+
+  useEffect(()=>{ 
+    console.log(dateFilterOption)
+    var startDate = convertDateToLocalDate(dateFilterOption[0].startDate)
+    var endDate = convertDateToLocalDate(dateFilterOption[0].endDate)
+    console.log(startDate,endDate)
+    var datanew
+    console.log(launchFilterOption)
+    if(launchFilterOption)
     {
-      var a = launchDetailsInfo.filter
-        ((item) => item.launch_success == true)
-      setCurrentDetail(a)
+      if(launchFilterOption == 'Successful Launches')
+      {
+          datanew = launchDetailsInfo.filter(
+          (item) => item.launch_success == true 
+           );
+          console.log(datanew)
+          setLaunchDetails(datanew)
+          setLaunchCount(datanew.length)
+      }
+      else if(launchFilterOption === 'All Launches')
+      {
+        setLaunchDetails(launchDetailsInfo)
+        setLaunchCount(launchDetailsInfo.length)
+      }
+      else if(launchFilterOption == 'Failed Launches')
+      {
+        datanew = launchDetailsInfo.filter(
+          (item) => item.launch_success === false 
+           );
+        console.log(datanew)
+        setLaunchDetails(datanew)
+        setLaunchCount(datanew.length)
+      }
+      else if(launchFilterOption == 'Upcoming Launches')
+      {
+        datanew = launchDetailsInfo.filter(
+          (item) => item.upcoming === true 
+           );
+        console.log(datanew)
+        setLaunchDetails(datanew)
+        setLaunchCount(datanew.length)
+      }
     }
-  },[filterOption])
+  },[launchFilterOption,dateFilterOption])
 
   useEffect(()=>{
     setLaunchDetails(launchDetailsInfo);
@@ -96,10 +152,12 @@ export default function LaunchDetails({filterOption}) {
   },[launchDetailsInfo])
 
   useEffect(() => {
-    const indexOfLastRule = currentPage * rulesPerPage;
-    const indexOfFirstRule = indexOfLastRule - rulesPerPage;
-    setCurrentDetail(launchDetailsInfo.slice(indexOfFirstRule, indexOfLastRule));
-  }, [launchDetailsInfo, currentPage]);
+    if(launchDetails){
+      const indexOfLastRule = currentPage * rulesPerPage;
+      const indexOfFirstRule = indexOfLastRule - rulesPerPage;
+      setCurrentDetail(launchDetails.slice(indexOfFirstRule, indexOfLastRule));
+    }
+  }, [launchDetails, currentPage,launchFilterOption]);
 
   return (
     <Grid container direction="column">
@@ -118,24 +176,30 @@ export default function LaunchDetails({filterOption}) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {currentDetail && currentDetail.map((row) => (
-            <TableRow  >
+          {currentDetail && currentDetail.map((row, index) => (
+            <TableRow key={index}  >
               <TableCell className={classes.tableData}>{row.flight_number}</TableCell>
               <TableCell className={classes.tableData} component="th" scope="row">
                 {row.launch_date_utc}
               </TableCell>
               <TableCell className={classes.tableData}>{row.launch_site.site_name}</TableCell>
-              <TableCell className={classes.tableData} onClick={()=>openDetailsModal()}>
+              <TableCell className={classes.tableData} onClick={()=>openDetailsModal(row)}>
               {row.mission_name}
               </TableCell>
               <TableCell className={classes.tableData}>{row.rocket.second_stage.payloads[0].orbit}</TableCell>
-              {row.launch_success ?
+              {row.launch_success && !row.upcoming?  
               <TableCell className={classes.tableData}>
               <Chip  label="Success" className={classes.successChip}/>
               </TableCell>
               :
+              !row.upcoming && row.launch_success !== 'true' && row.launch_success!== 'null'?
               <TableCell className={classes.tableData}>
               <Chip  label="Failure"  className={classes.failureChip}/>
+              </TableCell>
+              :
+              row.upcoming &&
+              <TableCell className={classes.tableData}>
+              <Chip  label="Upcoming"  className={classes.upcomingChip}/>
               </TableCell>
               }
               <TableCell className={classes.tableData}>{row.rocket.rocket_name}</TableCell>
@@ -156,6 +220,7 @@ export default function LaunchDetails({filterOption}) {
     </Grid>
     {openModal && (
       <LaunchDetailsModal
+        rowDetails={rowDetails}
         open={openModal}
         onClose={(e) => handleClose()}
       />

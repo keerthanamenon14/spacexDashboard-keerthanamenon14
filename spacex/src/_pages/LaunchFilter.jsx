@@ -1,7 +1,8 @@
 import React,{useState,useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid'
 import { useDispatch, useSelector } from 'react-redux'
+import {getLaunchFilter} from '../_redux/_actions/LaunchDetailsActions'
+import Grid from '@material-ui/core/Grid'
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import SortIcon from '@material-ui/icons/Sort';
@@ -24,16 +25,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LaunchFilter() {
     const classes= useStyles()
+    const dispatch = useDispatch()
     const [options, setOptions] = useState('All Launches')
 
     const handleChange = (event) => {
       setOptions(event.target.value);
+      dispatch(getLaunchFilter(event.target.value))
     };
-
-    // useEffect(()=>{
-    //   console.log(options);
-    //   <LaunchDetails filterOption={options}/>
-    // },[options])
 
     const menuList = ['All Launches','Upcoming Launches','Successful Launches','Failed Launches'];
 
@@ -56,8 +54,10 @@ export default function LaunchFilter() {
             getContentAnchorEl: null
           }}
         >
-          {menuList.map((item)=>
-            <MenuItem value={item}>{item}</MenuItem>
+          {menuList.map((item, index)=>
+            <MenuItem key={index} value={item}>
+            {item}
+            </MenuItem>
           )}
         </Select>
         </FormControl>

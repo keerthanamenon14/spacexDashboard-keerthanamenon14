@@ -4,13 +4,20 @@ import LaunchDetails from '../_pages/LaunchDetails.jsx'
 import LaunchFilter from '../_pages/LaunchFilter.jsx'
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
+import DateRange from '../_pages/DateRange.jsx'
 
 const useStyles = makeStyles({
     seperators:{
       paddingTop:'25px',
-      paddingRight: '100px',
-      paddingLeft: '100px',
-      paddingBottom: '25px'
+      paddingRight: '300px',
+      paddingLeft: '300px',
+      paddingBottom: '25px',
+    },
+    containerData:{
+      paddingTop:'25px',
+      paddingRight: '200px',
+      paddingLeft: '200px',
+      paddingBottom: '25px',
     }
   });
 
@@ -29,7 +36,7 @@ const DashboardList = ()=>{
             <Divider style={{width:'100%'}} />
             <Grid container justify='space-between' className={classes.seperators}>
                 <Grid item>
-                    Hi
+                  <DateRange/>
                 </Grid>
                 <Grid item>
                    <LaunchFilter/>
