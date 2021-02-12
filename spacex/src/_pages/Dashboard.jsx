@@ -5,6 +5,7 @@ import LaunchFilter from '../_pages/LaunchFilter.jsx'
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
 import DateRange from '../_pages/DateRange.jsx'
+import spaceX from '../_assets/spaceX.png'
 
 const useStyles = makeStyles({
     seperators:{
@@ -18,6 +19,10 @@ const useStyles = makeStyles({
       paddingRight: '200px',
       paddingLeft: '200px',
       paddingBottom: '25px',
+    },
+    spaceXImg:{
+        width:'550px',
+        padding:'20px'
     }
   });
 
@@ -31,7 +36,7 @@ const DashboardList = ()=>{
         justify="center"
         >
             <Grid item>
-                <h1>SPACE X</h1>
+                <img src={spaceX} className={classes.spaceXImg}></img>
             </Grid>
             <Divider style={{width:'100%'}} />
             <Grid container justify='space-between' className={classes.seperators}>

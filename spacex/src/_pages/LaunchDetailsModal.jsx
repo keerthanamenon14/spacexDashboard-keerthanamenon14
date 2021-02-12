@@ -1,5 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import LaunchModalHeader from "../_pages/LaunchModalHeader.jsx"
 import Grid from '@material-ui/core/Grid'
 import Dialog from '@material-ui/core/Dialog';
 import Table from '@material-ui/core/Table';
@@ -8,7 +9,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import Divider from '@material-ui/core/Divider';
 import CloseIcon from '@material-ui/icons/Close';
-import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -16,10 +16,11 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 
 const useStyles = makeStyles((theme) => ({
     outerContainer:{
-        padding : '40px'
+        paddingBottom : '10px'
     },
     table: {
-        width: '100%',
+        width: '100',
+        lineHeight:'1px'
     },
     sideHeading:{
         width:'40%',
@@ -37,11 +38,17 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor:'inherit',
         border:'none',
         cursor:'pointer'
+    },
+    dialogPaper:{
+        width:'800px',
+        height:'700px', 
+        marginTop:'30', 
+        overflow: 'hidden',
+        padding : '40px'
     }
 }))
 
 export default function LaunchDetailsModal({open,onClose,rowDetails}) {
-    console.log(rowDetails)
     const classes= useStyles()
     return(
     <Grid >
@@ -49,12 +56,16 @@ export default function LaunchDetailsModal({open,onClose,rowDetails}) {
      open={open} 
      onClose={onClose} 
      disableBackdropClick
-     PaperProps={{style:{width:'700px', height:'800px', marginTop:'30', overflow: 'hidden'}}}
+     classes={{ paper: classes.dialogPaper }}
      >
         <Grid container direction="column" className={classes.outerContainer}>
-            <Grid item container justify='space-between'>
-                <h3>LAUNCH NAME</h3>
+            <Grid container justify='space-between'>  
+                <Grid item>            
+                <LaunchModalHeader rowData={rowDetails}/>
+                </Grid>
+                <Grid item>
                 <button className={classes.closeButton}><CloseIcon onClick={onClose}/></button>
+                </Grid> 
             </Grid>
             <Grid item style={{marginBottom:'40px'}}>
                 <p>{rowDetails.details}</p>
