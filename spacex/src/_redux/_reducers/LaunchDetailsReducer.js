@@ -18,7 +18,7 @@ export const LaunchDetailsReducer = (state = initialState, action) => {
         case GET_LAUNCH_DETAILS_SUCCESS:
             return {
                 ...state,
-                loading: true,
+                loading: false,
                 data: action.payload
             }
         case GET_LAUNCH_DETAILS_FAILURE:
@@ -31,11 +31,13 @@ export const LaunchDetailsReducer = (state = initialState, action) => {
         case GET_LAUNCH_FILTER_SUCCESS:
             return{
                 ...state,
+                loading: false,
                 launchFilter:action.payload
             }
         case GET_DATE_FILTER_SUCCESS:
             return{
                 ...state,
+                loading: false,
                 dateFilter:action.payload
             }
         default:

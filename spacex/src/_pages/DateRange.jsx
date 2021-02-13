@@ -1,9 +1,8 @@
 import {  DateRangePicker,
-  defaultStaticRanges,
   createStaticRanges } from 'react-date-range';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch} from 'react-redux'
 import {getDateFilter} from '../_redux/_actions/LaunchDetailsActions'
 import {
   addDays,
@@ -42,7 +41,7 @@ const useStyles = makeStyles({
 export default function DateRange() {
   const classes = useStyles();
   const dispatch = useDispatch()
-  const [calenderLabel, setCalenderLabel] = useState('Past 6 Months')
+  const [calenderLabel, setCalenderLabel] = useState('Choose Dates')
   const defineds = {
     startOfWeek: startOfWeek(new Date()),
     endOfWeek: endOfWeek(new Date()),
@@ -69,8 +68,8 @@ export default function DateRange() {
   };
 const [state, setState] = useState([
   {
-    startDate: new Date(),
-    endDate: addDays(new Date(), 7),
+    startDate:startOfYear(addYears(new Date(), -15)),
+    endDate: new Date(),
     key: 'selection'
   }
 ] );
@@ -82,13 +81,13 @@ const setDateFilter = (item) =>{
   {
     setCalenderLabel(item.selection.label)
   }
-  else{
-    var x = new Date(item.selection.startDate).toString()
-    var y = new Date(item.selection.endDate).toString()
-    var date1 = x.split(' ').slice(1, 4).join(' ');
-    var date2 = y.split(' ').slice(1, 4).join(' ');
-    console.log(date1,date2)
-  }
+  // else{
+  //   var x = new Date(item.selection.startDate).toString()
+  //   var y = new Date(item.selection.endDate).toString()
+  //   var date1 = x.split(' ').slice(1, 4).join(' ');
+  //   var date2 = y.split(' ').slice(1, 4).join(' ');
+  //   console.log(date1,date2)
+  // }
   dispatch(getDateFilter([item.selection]))
 }
 
@@ -140,6 +139,14 @@ const sideBarOptions = () => {
         label:"Past 2 Years",
         startDate: defineds.startOfLastTwoYear,
         endDate: defineds.endOflastTwoYear
+      })
+    },
+    {
+      label: "Clear",
+      range: () =>({
+        label:"All Dates",
+        startDate : null,
+        endDate: null
       })
     }
   ];

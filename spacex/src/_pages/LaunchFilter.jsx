@@ -29,6 +29,7 @@ export default function LaunchFilter() {
     const [options, setOptions] = useState('All Launches')
 
     const handleChange = (event) => {
+      console.log(event)
       setOptions(event.target.value);
       dispatch(getLaunchFilter(event.target.value))
     };

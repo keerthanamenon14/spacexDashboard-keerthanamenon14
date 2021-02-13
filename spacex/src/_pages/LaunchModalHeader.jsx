@@ -1,6 +1,9 @@
-import React,{useState,useEffect} from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
+import nasa from '../_assets/nasa.png'
+import wikipedia from '../_assets/wikipedia.png'
+import YouTubeIcon from '@material-ui/icons/YouTube';
 import Grid from '@material-ui/core/Grid'
 import Chip from '@material-ui/core/Chip';
 
@@ -24,14 +27,20 @@ const useStyles = makeStyles({
         backgroundColor:'#fff9c4'
       },
       missionImage:{
-        width: '80px',
-        height:'70px'
+        width: '90px',
+        height:'90px'
       },
       missionImageBlock:{
         paddingRight: '10px'
       },
       missionDetailsContainer:{
         paddingRight: '10px'
+      },
+      imageStyle:{
+        width:'30px',
+        marginRight:'10px',
+        marginTop:'10px',
+        cursor:'pointer'
       }
 })
 
@@ -41,10 +50,12 @@ return(
     <Grid container direction="row">
         <Grid container>
             <Grid item className={classes.missionImageBlock}>
+            {rowData.links.mission_patch_small&&   
                  <img src={rowData.links.mission_patch_small} 
                  alt="image"
                  className={classes.missionImage}
                  />
+            }
             </Grid>
             <Grid item>
             <Grid container direction="column" className={classes.missionDetailsContainer}>
@@ -54,8 +65,30 @@ return(
             <Grid item style={{fontSize:'15px', lineHeight:'1.5'}}>
                 {rowData.rocket.rocket_name}
             </Grid>
-            <Grid item>
-                CRS-1
+            <Grid container>
+              <Grid item> 
+                  <img className={classes.imageStyle} 
+                  src={nasa}
+                  onClick={()=>window.open(rowData.links.article_link, '_blank')}  
+                  >
+                  </img>
+              </Grid>
+              <Grid item>
+                {rowData.links.wikipedia&& 
+                   <img className={classes.imageStyle} 
+                   src={wikipedia}  
+                   onClick={()=>window.open(rowData.links.wikipedia, '_blank')}            
+                   >
+                   </img>   
+                }      
+               </Grid>
+              <Grid item>
+                {rowData.links.video_link&&   
+                  <YouTubeIcon 
+                  onClick={()=>window.open(rowData.links.video_link, '_blank')}
+                  className={classes.imageStyle}/>
+                }
+               </Grid>          
             </Grid>
             </Grid>
             </Grid>

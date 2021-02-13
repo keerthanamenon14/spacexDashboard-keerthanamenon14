@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import Grid from '@material-ui/core/Grid'
-import * as moment from 'moment'
+import { history } from '../_redux/_store/history'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -12,6 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import {getLaunchDetails} from '../_redux/_actions/LaunchDetailsActions'
 import LaunchDetailsModal from "../_pages/LaunchDetailsModal.jsx"
+import SkeletonTableList from "../_pages/skeletonList"
 import FooterPagination from './FooterPagination'
 import Chip from '@material-ui/core/Chip';
 
@@ -63,6 +64,9 @@ export default function LaunchDetails() {
   const dateFilterOption = useSelector(
     (state) => state.launchdetails.dateFilter
   ) 
+  const launchDetailsLoading = useSelector(
+    (state) => state.launchdetails.loading
+  )
   const [launchDetails, setLaunchDetails] = useState()
   const [page, setPage] = useState(1)
   const [rulesPerPage] = useState(8)
@@ -74,7 +78,6 @@ export default function LaunchDetails() {
 
   //setting current page
   const paginate = (pageNumber) => {
-      console.log(pageNumber)
       setcurrentPage(pageNumber);
   };
 
@@ -91,7 +94,7 @@ export default function LaunchDetails() {
     setOpenModal(true);
     setRowDetails(row);
   }
-
+  console.log(launchDetailsLoading)
   useEffect(()=>{
     dispatch(getLaunchDetails())
   },[])
@@ -100,56 +103,60 @@ export default function LaunchDetails() {
     var x = new Date(str).toString()
     var date = x.split(' ').slice(0, 5).join(' ');
     return date
-    // var date = new Date(str),
-    // mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-    // day = ("0" + date.getDate()).slice(-2);
-    // return [day,mnth,date.getFullYear()].join("-");
-    // return d.getFullYear() + "-"+(d.getMonth()+1) +"-"+d.getDate() + ' '+d.toString().split(' ')[4];
+
   }
 
   // function to filter dates between ranges
   function filterDates (dateFilterOption){
-    var d1 = Date.parse(dateFilterOption[0].startDate);
-    var d2 = Date.parse(dateFilterOption[0].endDate); 
-    console.log(d1,d2) 
     var dateFilteredData = []
     launchDetailsInfo.map((item)=>{
-      // console.log(item.launch_date_utc,dateFilterOption[0].endDate)
-        if(item.launch_date_utc > dateFilterOption[0].startDate || item.launch_date_utc < dateFilterOption[0].endDate)
+        if(Date.parse(item.launch_date_utc) >= Date.parse(dateFilterOption[0].startDate) && Date.parse(item.launch_date_utc) < Date.parse(dateFilterOption[0].endDate))
         {
           dateFilteredData.push(item)
         }
     })
-    console.log(dateFilteredData)
     return dateFilteredData
   }
 
   useEffect(()=>{
-    console.log(dateFilterOption)
     if(dateFilterOption)
     {
-        console.log("hi")
+    if(dateFilterOption[0].startDate || dateFilterOption[0].endDate)
+    {
         var array = filterDates(dateFilterOption)
         console.log(array)
+        setLaunchDetails(array)
+        setLaunchCount(array.length)
+    }
+    else
+    {
+      setLaunchDetails(launchDetailsInfo)
+      setLaunchCount(launchDetailsInfo.length)
+    }
     }
   },[dateFilterOption])
 
   useEffect(()=>{ 
-    if(launchFilterOption)
-    {
+    console.log(launchFilterOption)
+       if(page!=1)
+       {
+           setPage(1)
+       }
       var datanew
       if(launchFilterOption)
       {
+            history.push(`/launchstatus=${launchFilterOption}`)
             if(launchFilterOption == 'Successful Launches')
              {
               datanew = launchDetailsInfo.filter(
-                 (item) => item.launch_success == true 
+                 (item) => item.launch_success == true          
              );
              setLaunchDetails(datanew)
              setLaunchCount(datanew.length)
              }
              else if(launchFilterOption === 'All Launches')
              {
+              console.log("heyyyyyyyy")
                  setLaunchDetails(launchDetailsInfo)
                  setLaunchCount(launchDetailsInfo.length)
              }
@@ -158,7 +165,6 @@ export default function LaunchDetails() {
                  datanew = launchDetailsInfo.filter(
                   (item) => item.launch_success === false 
                   );
-                  console.log(datanew)
                   setLaunchDetails(datanew)
                   setLaunchCount(datanew.length)
               }
@@ -172,8 +178,101 @@ export default function LaunchDetails() {
                    setLaunchCount(datanew.length)
               }
         }
-     }
   },[launchFilterOption])
+
+  // useEffect(()=>{
+  // var datanew
+  //     if(launchFilterOption && !dateFilterOption)
+  //     {
+  //       if(launchFilterOption == 'Successful Launches')
+  //       {
+  //        datanew = launchDetailsInfo.filter(
+  //           (item) => item.launch_success == true          
+  //       );
+  //       setLaunchDetails(datanew)
+  //       setLaunchCount(datanew.length)
+  //       }
+  //       else if(launchFilterOption === 'All Launches')
+  //       {
+  //        console.log("heyyyyyyyy")
+  //           setLaunchDetails(launchDetailsInfo)
+  //           setLaunchCount(launchDetailsInfo.length)
+  //       }
+  //       else if(launchFilterOption == 'Failed Launches')
+  //       {
+  //           datanew = launchDetailsInfo.filter(
+  //            (item) => item.launch_success === false 
+  //            );
+  //            setLaunchDetails(datanew)
+  //            setLaunchCount(datanew.length)
+  //        }
+  //        else if(launchFilterOption == 'Upcoming Launches')
+  //        {
+  //             datanew = launchDetailsInfo.filter(
+  //             (item) => item.upcoming === true 
+  //             );
+  //             console.log(datanew)
+  //             setLaunchDetails(datanew)
+  //             setLaunchCount(datanew.length)
+  //        }
+  //     }
+  //     else if(dateFilterOption && !launchFilterOption)
+  //     {
+  //       if(dateFilterOption[0].startDate || dateFilterOption[0].endDate)
+  //         {
+  //            var array = filterDates(dateFilterOption)
+  //            console.log(array)
+  //            setLaunchDetails(array)
+  //            setLaunchCount(array.length)
+  //         }
+  //         else
+  //         {
+  //            setLaunchDetails(launchDetailsInfo)
+  //            setLaunchCount(launchDetailsInfo.length)
+  //         }
+  //      }
+  //      else if(dateFilterOption && launchFilterOption )
+  //      {
+  //       if(launchFilterOption == 'Successful Launches')
+  //       {
+  //        datanew = launchDetailsInfo.filter(
+  //           (item) => item.launch_success == true &&
+  //           Date.parse(item.launch_date_utc) >= Date.parse(dateFilterOption[0].startDate) 
+  //           && Date.parse(item.launch_date_utc) < Date.parse(dateFilterOption[0].endDate)
+                     
+  //       );
+  //       setLaunchDetails(datanew)
+  //       setLaunchCount(datanew.length)
+  //       }
+  //       else if(launchFilterOption === 'All Launches')
+  //       {
+  //        console.log("heyyyyyyyy")
+  //           setLaunchDetails(launchDetailsInfo)
+  //           setLaunchCount(launchDetailsInfo.length)
+  //       }
+  //       else if(launchFilterOption == 'Failed Launches')
+  //       {
+  //           datanew = launchDetailsInfo.filter(
+  //            (item) => item.launch_success === false  &&
+  //            Date.parse(item.launch_date_utc) >= Date.parse(dateFilterOption[0].startDate) 
+  //            && Date.parse(item.launch_date_utc) < Date.parse(dateFilterOption[0].endDate)
+  //            );
+  //            setLaunchDetails(datanew)
+  //            setLaunchCount(datanew.length)
+  //        }
+  //        else if(launchFilterOption == 'Upcoming Launches')
+  //        {
+  //             datanew = launchDetailsInfo.filter(
+  //             (item) => item.upcoming === true &&
+  //             Date.parse(item.launch_date_utc) >= Date.parse(dateFilterOption[0].startDate) 
+  //             && Date.parse(item.launch_date_utc) < Date.parse(dateFilterOption[0].endDate) 
+  //             );
+  //             console.log(datanew)
+  //             setLaunchDetails(datanew)
+  //             setLaunchCount(datanew.length)
+  //        }
+  //      }
+  // },[launchFilterOption,dateFilterOption])
 
   useEffect(()=>{
     if(launchDetailsInfo)
@@ -184,21 +283,21 @@ export default function LaunchDetails() {
       var a = convertDateToLocalDate(item.launch_date_utc)
       item.launch_date_utc = a
     })
-    console.log(tempArray)
     setLaunchDetails(launchDetailsInfo);
     setLaunchCount(launchDetailsInfo.length)
    }
   },[launchDetailsInfo])
 
   useEffect(() => {
-    if(launchDetails){
-      console.log(launchDetails)     
+    if(launchDetails){   
+      console.log(launchDetails) 
       const indexOfLastRule = currentPage * rulesPerPage;
       const indexOfFirstRule = indexOfLastRule - rulesPerPage;
       console.log(indexOfLastRule,indexOfFirstRule)
       console.log(launchDetails.slice(indexOfFirstRule, indexOfLastRule))
       if(launchDetails.length < rulesPerPage || launchDetails.length < indexOfFirstRule)
       {
+        console.log("yes")
         setcurrentPage(1)
         setPage(1)
         setCurrentDetail(launchDetails)
@@ -208,9 +307,10 @@ export default function LaunchDetails() {
         setCurrentDetail(launchDetails.slice(indexOfFirstRule, indexOfLastRule));
       }
     }
-  }, [launchDetails, currentPage,launchFilterOption]);
+  }, [launchDetails, currentPage,launchFilterOption,dateFilterOption]);
 
   return (
+    <React.Fragment>
     <Grid container direction="column">
     <Grid item className={classes.detailsTable}>
     <TableContainer component={Paper}>
@@ -227,6 +327,9 @@ export default function LaunchDetails() {
           </TableRow>
         </TableHead>
         <TableBody>
+        {launchDetailsLoading && (
+           <SkeletonTableList number={7}/>
+        )}
           {currentDetail && currentDetail.map((row, index) => (
             <TableRow key={index}  >
               <TableCell className={classes.tableData}>{row.flight_number}</TableCell>
@@ -258,10 +361,15 @@ export default function LaunchDetails() {
               <TableCell className={classes.tableData}>{row.rocket.rocket_name}</TableCell>
             </TableRow>
           ))}
-        </TableBody>
+        </TableBody>     
       </Table>
      </TableContainer>
     </Grid>
+    {currentDetail.length === 0 && launchDetailsLoading === false &&
+              <Grid container justify='center' style={{padding:'40px'}} >
+              No results found for specific filter
+              </Grid>
+    }
     <Grid item className={classes.paginationItem}>
         <FooterPagination
           page={page}
@@ -279,5 +387,6 @@ export default function LaunchDetails() {
       />
     )}
     </Grid>
+    </React.Fragment>
   );
 }
