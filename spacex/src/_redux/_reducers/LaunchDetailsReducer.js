@@ -10,7 +10,13 @@ const initialState = {
     launchFilter:'',
     dateFilter:'',
     data: '',
-    error: null
+    error: null,
+    menuOptions:{
+        clear: 'All Launches',
+        [[null]]: 'Upcoming Launches',
+        true: 'Successful Launches',
+        false: 'Failed Launches'
+    }
 }
 
 export const LaunchDetailsReducer = (state = initialState, action) => {

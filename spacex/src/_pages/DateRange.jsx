@@ -2,7 +2,8 @@ import {  DateRangePicker,
   createStaticRanges } from 'react-date-range';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
-import { useDispatch} from 'react-redux'
+import { useDispatch,useSelector} from 'react-redux'
+import {getLaunchFilter} from '../_redux/_actions/LaunchDetailsActions'
 import {getDateFilter} from '../_redux/_actions/LaunchDetailsActions'
 import {
   addDays,
@@ -11,18 +12,19 @@ import {
   startOfMonth,
   endOfMonth,
   addMonths,
-  startOfWeek,
-  endOfWeek,
   startOfYear,
   endOfYear,
   addYears
 } from "date-fns";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import Grid from '@material-ui/core/Grid'
 import Dialog from '@material-ui/core/Dialog';
+import { Typography } from '@material-ui/core';
+import queryString from 'query-string'
+import { history } from '../_redux/_store/history'
 
 const useStyles = makeStyles({
   button:{
@@ -31,10 +33,15 @@ const useStyles = makeStyles({
   },
   dialogPaper:{
       maxWidth:'700px', 
-      height:'450px', 
+      height:'400px', 
       marginTop:'30', 
       overflow: 'hidden',
       padding:'30px'
+  },
+  doneButton:{
+      width:100,
+      backgroundColor:'#4dabf5',
+      border:'none'
   }
 })
 
@@ -43,18 +50,11 @@ export default function DateRange() {
   const dispatch = useDispatch()
   const [calenderLabel, setCalenderLabel] = useState('Choose Dates')
   const defineds = {
-    startOfWeek: startOfWeek(new Date()),
-    endOfWeek: endOfWeek(new Date()),
-    startOfLastWeek: startOfWeek(addDays(new Date(), -7)),
-    endOfLastWeek: endOfWeek(addDays(new Date(), -7)),
-    startOfToday: startOfDay(new Date()),
-    startOfLastSevenDay: startOfDay(addDays(new Date(), -7)),
     startOfLastThirtyDay: startOfDay(addDays(new Date(), -30)),
     startOfLastNintyDay: startOfDay(addDays(new Date(), -90)),
     lastSixMonths:startOfDay(addDays(new Date(), -180)),
     endOfToday: endOfDay(new Date()),
     startOfYesterday: startOfDay(addDays(new Date(), -1)),
-    endOfYesterday: endOfDay(addDays(new Date(), -1)),
     startOfMonth: startOfMonth(new Date()),
     endOfMonth: endOfMonth(new Date()),
     startOfLastMonth: startOfMonth(addMonths(new Date(), -1)),
@@ -66,32 +66,66 @@ export default function DateRange() {
     endOflastYear: endOfYear(addYears(new Date(), -1)),
     endOflastTwoYear: endOfYear(addYears(new Date(), -1))  
   };
-const [state, setState] = useState([
+  // const queryValues = queryString.parse(history.location.search);
+
+  // useEffect(()=>{
+  //   console.log(queryValues)
+  //   var array = [];
+  //   array.push({
+  //     startDate : queryValues.startdate,
+  //     endDate: queryValues.enddate,
+  //     label: queryValues.label
+  //   })
+  //   if(queryValues.label == 'All Dates')
+  //   {
+  //     dispatch(getLaunchFilter('All Launches'))
+  //     dispatch(getDateFilter(null))
+  //     setCalenderLabel(queryValues.label)
+  //   }
+  //   else
+  //   {
+  //     setCalenderLabel(queryValues.label)
+  //     dispatch(getDateFilter([array]))
+  //   }
+  // },[])
+
+  const [state, setState] = useState([
   {
-    startDate:startOfYear(addYears(new Date(), -15)),
-    endDate: new Date(),
+    startDate: null,
+    endDate: null,
     key: 'selection'
   }
-] );
+  ]);
 
-const setDateFilter = (item) =>{
-  console.log([item.selection])
+
+  const launchFilterOption = useSelector(
+    (state) => state.launchdetails.launchFilter
+  )
+
+  useEffect(()=>{
+    if(launchFilterOption == 'All Launches')
+    {
+      setCalenderLabel('All Dates')
+    }
+  },[launchFilterOption])
+
+  const setDateFilter = (item) =>{
+  console.log(item)
   setState([item.selection])
-  if(item.selection.label)
+  if(item.selection.label == 'All Dates')
   {
+    dispatch(getLaunchFilter('All Launches'))
+    dispatch(getDateFilter(null))
     setCalenderLabel(item.selection.label)
   }
-  // else{
-  //   var x = new Date(item.selection.startDate).toString()
-  //   var y = new Date(item.selection.endDate).toString()
-  //   var date1 = x.split(' ').slice(1, 4).join(' ');
-  //   var date2 = y.split(' ').slice(1, 4).join(' ');
-  //   console.log(date1,date2)
-  // }
-  dispatch(getDateFilter([item.selection]))
-}
+  else 
+  {
+    setCalenderLabel(item.selection.label)
+    dispatch(getDateFilter([item.selection]))
+  }
+  }
 
-const sideBarOptions = () => {
+  const sideBarOptions = () => {
   const customDateObjects = [
     {
       label: "Past Week",
@@ -142,11 +176,19 @@ const sideBarOptions = () => {
       })
     },
     {
+      label:'customise',
+      range: () =>({
+        label:"customise",
+        startDate : new Date(),
+        endDate: new Date()
+      })
+    },
+    {
       label: "Clear",
       range: () =>({
         label:"All Dates",
-        startDate : null,
-        endDate: null
+        startDate : new Date(),
+        endDate: startOfYear(addYears(new Date(), -15))
       })
     }
   ];
@@ -154,7 +196,6 @@ const sideBarOptions = () => {
 };
 
   const staticRanges = [
-    // ...defaultStaticRanges,
     ...createStaticRanges(sideBarOptions())
   ];
 
@@ -182,7 +223,7 @@ return(
     <Dialog open={showDatePicker}  
     classes={{ paper: classes.dialogPaper }}>
     <DateRangePicker
-         style={{width:'250px', maxHeight:'400px'}}
+         style={{width:'250px', maxHeight:'300px'}}
          onChange={item => setDateFilter(item)}
          showSelectionPreview={true}
          moveRangeOnFirstSelection={false}
@@ -191,10 +232,12 @@ return(
          direction="horizontal"
          inputRanges={[]}
          staticRanges={staticRanges} 
-         rdrCalendarWrapper        
+         showDateDisplay={false}
      />
      <Grid container justify="center">
-     <button onClick={()=>closeCalender()}>Done</button>
+     <button onClick={()=>closeCalender()} className={classes.doneButton}>
+     <Typography fontSize='1rem'>Done</Typography>
+     </button>
      </Grid>
     </Dialog>
     </Grid>

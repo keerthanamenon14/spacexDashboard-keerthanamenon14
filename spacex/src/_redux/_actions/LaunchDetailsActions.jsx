@@ -31,7 +31,6 @@ export const getLaunchDetails = () =>{
 }
 
 export const getLaunchFilter = (filterName) =>{
-    console.log(filterName)
     return {
         type: types.GET_LAUNCH_FILTER_SUCCESS,
         payload: filterName
@@ -39,7 +38,6 @@ export const getLaunchFilter = (filterName) =>{
 }
 
 export const getDateFilter = (filterDate) =>{
-    console.log(filterDate)
     return {
         type: types.GET_DATE_FILTER_SUCCESS,
         payload: filterDate

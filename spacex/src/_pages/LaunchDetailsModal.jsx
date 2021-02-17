@@ -40,8 +40,8 @@ const useStyles = makeStyles((theme) => ({
         width:'800px',
         height:'700px', 
         marginTop:'30', 
-        overflow: 'hidden',
-        padding : '40px'
+        overflow: 'scroll',
+        padding : '30px'
     }
 }))
 

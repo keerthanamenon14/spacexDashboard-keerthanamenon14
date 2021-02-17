@@ -1,15 +1,13 @@
 import React,{useState,useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useDispatch, useSelector } from 'react-redux'
-import {getLaunchFilter} from '../_redux/_actions/LaunchDetailsActions'
+import {getLaunchFilter,getDateFilter} from '../_redux/_actions/LaunchDetailsActions'
 import Grid from '@material-ui/core/Grid'
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import SortIcon from '@material-ui/icons/Sort';
 import Select from '@material-ui/core/Select';
-import { ListItemIcon,ListItemText } from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
-import LaunchDetails from '../_pages/LaunchDetails.jsx'
+import queryString from 'query-string'
+import { history } from '../_redux/_store/history'
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -27,20 +25,29 @@ export default function LaunchFilter() {
     const classes= useStyles()
     const dispatch = useDispatch()
     const [options, setOptions] = useState('All Launches')
+    // const queryValues = queryString.parse(history.location.search);
+
+    // useEffect(()=>{
+    //   setOptions(queryValues.launchfilter);
+    //   dispatch(getLaunchFilter(queryValues.launchfilter))
+    //   if(queryValues.launchfilter=='All Launches'){
+    //     dispatch(getDateFilter(null))
+    //   }
+    // },[]) 
 
     const handleChange = (event) => {
-      console.log(event)
       setOptions(event.target.value);
       dispatch(getLaunchFilter(event.target.value))
+      if(event.target.value=='All Launches'){
+        dispatch(getDateFilter(null))
+      }
     };
 
     const menuList = ['All Launches','Upcoming Launches','Successful Launches','Failed Launches'];
-
+    
     return(
     <Grid>
         <FormControl className={classes.formControl}>
-         {/* <SortIcon className={classes.label}/> */}
-         {/* <InputLabel id="select-label">{options}</InputLabel> */}
          <Select
           labelId="select-label-for-launches"
           id="filterLaunches"
