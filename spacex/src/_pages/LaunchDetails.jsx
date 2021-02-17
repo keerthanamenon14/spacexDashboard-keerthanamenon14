@@ -72,7 +72,6 @@ export default function LaunchDetails() {
   useSelector(
     (state) => state.launchdetails.menuOptions
   ) 
-
   const launchDetailsLoading = useSelector(
     (state) => state.launchdetails.loading
   )
@@ -104,6 +103,10 @@ export default function LaunchDetails() {
     setOpenModal(true);
     setRowDetails(row);
   }
+
+  useEffect(()=>{
+    dispatch(getLaunchDetails())
+  },[])
 
   useEffect(()=>{
       setLaunchFilterOpt(launchFilterOption)
