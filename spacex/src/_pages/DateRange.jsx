@@ -47,7 +47,7 @@ const useStyles = makeStyles({
 export default function DateRange() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const [calenderLabel, setCalenderLabel] = useState("Choose Dates");
+  const [calenderLabel, setCalenderLabel] = useState();
   const defineds = {
     startOfLastWeek: startOfDay(addDays(new Date(), -14)),
     endOfLastWeek: startOfDay(addDays(new Date(), -7)),
@@ -95,8 +95,6 @@ export default function DateRange() {
   }, [launchFilterOption]);
 
   const setDateFilter = (item) => {
-    debugger;
-    console.log(item);
     setState([item.selection]);
     if (item.selection.label == "All Dates") {
       dispatch(getLaunchFilter("All Launches"));

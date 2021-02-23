@@ -29,6 +29,9 @@ export default function LaunchFilter() {
   const dispatch = useDispatch();
   const [options, setOptions] = useState("All Launches");
   const queryValues = queryString.parse(history.location.search);
+  const dateFilterOption = useSelector(
+    (state) => state.launchdetails.dateFilter
+  );
 
   useEffect(() => {
     if (queryValues.launchfilter) {
@@ -36,8 +39,13 @@ export default function LaunchFilter() {
     }
   }, []);
 
+  useEffect(() => {
+    if (dateFilterOption && dateFilterOption == "null") {
+      setOptions("All Launches");
+    }
+  }, [dateFilterOption]);
+
   const handleChange = (event) => {
-    debugger;
     setOptions(event.target.value);
     dispatch(getLaunchFilter(event.target.value));
     if (event.target.value == "All Launches") {

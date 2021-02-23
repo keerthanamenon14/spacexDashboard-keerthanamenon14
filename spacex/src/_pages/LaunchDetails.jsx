@@ -63,14 +63,13 @@ export default function LaunchDetails() {
   const dateFilterOption = useSelector(
     (state) => state.launchdetails.dateFilter
   );
-  const [launchFilterOpt, setLaunchFilterOpt] = useState();
+  const [launchFilterOpt, setLaunchFilterOpt] = useState("All Launches");
   const [dateFilterOpt, setDateFilterOpt] = useState();
 
   const menuOptions = useSelector((state) => state.launchdetails.menuOptions);
   const launchDetailsLoading = useSelector(
     (state) => state.launchdetails.loading
   );
-  console.log(launchFilterOption);
   const [launchDetails, setLaunchDetails] = useState();
   const [page, setPage] = useState(1);
   const [rulesPerPage] = useState(8);
@@ -80,6 +79,7 @@ export default function LaunchDetails() {
   const [openModal, setOpenModal] = useState(false);
   const [rowDetails, setRowDetails] = useState("");
   const queryValues = queryString.parse(history.location.search);
+
   //setting current page
   const paginate = (pageNumber) => {
     setcurrentPage(pageNumber);
@@ -100,19 +100,11 @@ export default function LaunchDetails() {
   };
 
   useEffect(() => {
-    console.log(queryValues);
-    debugger;
     dispatch(getLaunchDetails());
-    if (
-      queryValues.startdate == null &&
-      queryValues.enddate == null &&
-      queryValues.label == null
-    ) {
-      history.push(
-        `/launchstatus?launchfilter=null&startdate=null&enddate=null&label=null`
-      );
+    if (!queryValues) {
+      history.push(`/launchstatus?launchfilter=${launchFilterOpt}`);
+      filterData(launchFilterOpt, null);
     } else {
-      console.log("im in");
       setLaunchFilterOpt(queryValues.launchfilter);
       setDateFilterOpt([
         {
@@ -121,27 +113,8 @@ export default function LaunchDetails() {
           label: queryValues.label,
         },
       ]);
-      filterData(queryValues.launchfilter, [
-        {
-          startDate: queryValues.startdate,
-          endDate: queryValues.enddate,
-          label: queryValues.label,
-        },
-      ]);
     }
-    console.log(history);
   }, []);
-
-  useEffect(() => {
-    debugger;
-    if (launchFilterOption) {
-      setLaunchFilterOpt(launchFilterOption);
-    }
-    if (dateFilterOption) {
-      setDateFilterOpt(dateFilterOption);
-    }
-    filterData(launchFilterOption, dateFilterOption);
-  }, [launchFilterOption, dateFilterOption]);
 
   function convertDateToLocalDate(str) {
     var x = new Date(str).toString();
@@ -149,8 +122,44 @@ export default function LaunchDetails() {
     return date;
   }
 
+  useEffect(() => {
+    if (launchDetailsInfo) {
+      let tempArray = [];
+      tempArray = launchDetailsInfo;
+      tempArray.map((item) => {
+        var a = convertDateToLocalDate(item.launch_date_utc);
+        item.launch_date_utc = a;
+      });
+      if (!launchDetails) {
+        setLaunchDetails(launchDetailsInfo);
+        setLaunchCount(launchDetailsInfo.length);
+        history.push(`/launchstatus?launchfilter=${launchFilterOpt}`);
+        filterData(launchFilterOpt, null);
+      }
+      if (queryValues.startDate || queryValues.enddate || queryValues.label) {
+        filterData(queryValues.launchfilter, [
+          {
+            startDate: queryValues.startdate,
+            endDate: queryValues.enddate,
+            label: queryValues.label,
+          },
+        ]);
+      }
+    }
+  }, [launchDetailsInfo]);
+
+  useEffect(() => {
+    if (launchFilterOption || dateFilterOption) {
+      setLaunchFilterOpt(launchFilterOption);
+      setDateFilterOpt(dateFilterOption);
+      filterData(launchFilterOption, dateFilterOption);
+    }
+    // if (dateFilterOption) {
+    //   setDateFilterOpt(dateFilterOption);
+    // }
+  }, [launchFilterOption, dateFilterOption]);
+
   function filterData(launchFilterOpt, dateFilterOpt) {
-    debugger;
     let filteredData;
     if (launchDetailsInfo && (launchFilterOpt || dateFilterOpt)) {
       if (page != 1) {
@@ -170,53 +179,33 @@ export default function LaunchDetails() {
               launchFilterOpt == "null" ||
               launchFilterOpt == "All Launches") &&
             (dateFilterOpt == "" ||
+              dateFilterOpt == undefined ||
               dateFilterOpt == null ||
-              // dateFilterOpt.endDate == null ||
-              // dateFilterOpt.startDate == null ||
+              dateFilterOpt[0].endDate == null ||
+              dateFilterOpt[0].startDate == null ||
               (Date.parse(item.launch_date_utc) >=
                 Date.parse(dateFilterOpt[0].startDate) &&
                 Date.parse(item.launch_date_utc) <=
                   Date.parse(dateFilterOpt[0].endDate)))
         );
-        console.log(launchDetailsInfo);
         setLaunchDetails(filteredData);
         setLaunchCount(filteredData.length);
       }
       if (
-        dateFilterOpt
-        // &&
-        // (dateFilterOpt.endDate == null || dateFilterOpt.startDate == null)
+        dateFilterOpt &&
+        (dateFilterOpt[0].endDate != null || dateFilterOpt[0].startDate != null)
       ) {
         history.push(
           `/launchstatus?launchfilter=${launchFilterOpt}&startdate=${dateFilterOpt[0].startDate}&enddate=${dateFilterOpt[0].endDate}&label=${dateFilterOpt[0].label}`
         );
       } else {
-        history.push(
-          `/launchstatus?launchfilter=${launchFilterOpt}&startdate=null&enddate=null&label=null`
-        );
+        history.push(`/launchstatus?launchfilter=${launchFilterOpt}`);
       }
     }
   }
 
   useEffect(() => {
-    console.log(launchDetailsInfo);
-    if (launchDetailsInfo && !LaunchDetails) {
-      debugger;
-      let tempArray = [];
-      tempArray = launchDetailsInfo;
-      tempArray.map((item) => {
-        var a = convertDateToLocalDate(item.launch_date_utc);
-        item.launch_date_utc = a;
-      });
-      setLaunchDetails(launchDetailsInfo);
-      setLaunchCount(launchDetailsInfo.length);
-    }
-  }, [launchDetailsInfo]);
-
-  useEffect(() => {
     if (launchDetails) {
-      debugger;
-      console.log(launchDetailsInfo);
       const indexOfLastRule = currentPage * rulesPerPage;
       const indexOfFirstRule = indexOfLastRule - rulesPerPage;
       if (
@@ -231,7 +220,6 @@ export default function LaunchDetails() {
           launchDetails.slice(indexOfFirstRule, indexOfLastRule)
         );
       }
-      console.log(currentDetail);
     }
   }, [launchDetails, currentPage]);
 
