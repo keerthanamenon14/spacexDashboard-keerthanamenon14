@@ -36,6 +36,7 @@ export default function LaunchFilter() {
   useEffect(() => {
     if (queryValues.launchfilter) {
       setOptions(queryValues.launchfilter);
+      dispatch(getLaunchFilter(queryValues.launchfilter));
     }
   }, []);
 

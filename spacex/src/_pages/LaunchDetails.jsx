@@ -83,8 +83,6 @@ export default function LaunchDetails() {
   const [currentDetail, setCurrentDetail] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [rowDetails, setRowDetails] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const queryValues = queryString.parse(history.location.search);
 
   //setting current page
@@ -157,6 +155,7 @@ export default function LaunchDetails() {
 
   useEffect(() => {
     if (launchFilterOption || dateFilterOption) {
+      console.log(queryValues);
       setLaunchFilterOpt(launchFilterOption);
       setDateFilterOpt(dateFilterOption);
       filterData(launchFilterOption, dateFilterOption);
@@ -164,6 +163,7 @@ export default function LaunchDetails() {
   }, [launchFilterOption, dateFilterOption]);
 
   function filterData(launchFilterOpt, dateFilterOpt) {
+    console.log(dateFilterOpt);
     let filteredData;
     if (launchDetailsInfo && (launchFilterOpt || dateFilterOpt)) {
       if (page != 1) {
