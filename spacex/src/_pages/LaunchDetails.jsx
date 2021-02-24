@@ -230,18 +230,11 @@ export default function LaunchDetails() {
   return (
     <React.Fragment>
       <Grid container direction="column">
-        <Grid item>
-          {dateFilterOpt && (
-            <Typography className={classes.dateSelected}>
-              {startDate} - {endDate}
-            </Typography>
-          )}
-        </Grid>
         <Grid item className={classes.detailsTable}>
           <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
-                <TableRow style={{ backgroundColor: "#e1f5fe" }}>
+                <TableRow style={{ backgroundColor: "#f1f8e9" }}>
                   <TableCell className={classes.tableData}>No:</TableCell>
                   <TableCell className={classes.tableData}>
                     Launched(UTC)
