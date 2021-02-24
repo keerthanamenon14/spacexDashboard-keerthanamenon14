@@ -12,7 +12,7 @@ const useStyles = makeStyles({
     paddingTop: "25px",
     paddingRight: "300px",
     paddingLeft: "300px",
-    paddingBottom: "25px",
+    paddingBottom: "0px",
   },
   containerData: {
     paddingTop: "25px",

@@ -16,6 +16,7 @@ import SkeletonTableList from "../_pages/skeletonList";
 import FooterPagination from "./FooterPagination";
 import Chip from "@material-ui/core/Chip";
 import queryString from "query-string";
+import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
   table: {
@@ -51,6 +52,10 @@ const useStyles = makeStyles({
     color: "#f57c00",
     backgroundColor: "#fff9c4",
   },
+  dateSelected: {
+    fontSize: "20px",
+    paddingBottom: "10px",
+  },
 });
 
 export default function LaunchDetails() {
@@ -78,6 +83,8 @@ export default function LaunchDetails() {
   const [currentDetail, setCurrentDetail] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [rowDetails, setRowDetails] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const queryValues = queryString.parse(history.location.search);
 
   //setting current page
@@ -154,9 +161,6 @@ export default function LaunchDetails() {
       setDateFilterOpt(dateFilterOption);
       filterData(launchFilterOption, dateFilterOption);
     }
-    // if (dateFilterOption) {
-    //   setDateFilterOpt(dateFilterOption);
-    // }
   }, [launchFilterOption, dateFilterOption]);
 
   function filterData(launchFilterOpt, dateFilterOpt) {
@@ -226,6 +230,13 @@ export default function LaunchDetails() {
   return (
     <React.Fragment>
       <Grid container direction="column">
+        <Grid item>
+          {dateFilterOpt && (
+            <Typography className={classes.dateSelected}>
+              {startDate} - {endDate}
+            </Typography>
+          )}
+        </Grid>
         <Grid item className={classes.detailsTable}>
           <TableContainer component={Paper}>
             <Table className={classes.table} aria-label="simple table">
