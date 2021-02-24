@@ -1,30 +1,52 @@
 import {
-    GET_LAUNCH_DETAILS_SUCCESS,
-    GET_LAUNCH_DETAILS_FAILURE
-} from '../_constants/constants'
+  GET_LAUNCH_DETAILS_SUCCESS,
+  GET_LAUNCH_DETAILS_FAILURE,
+  GET_LAUNCH_FILTER_SUCCESS,
+  GET_DATE_FILTER_SUCCESS,
+} from "../_constants/constants";
 
 const initialState = {
-    loading: true,
-    data: '',
-    error: null
-}
+  loading: true,
+  launchFilter: "",
+  dateFilter: "",
+  data: "",
+  error: null,
+  menuOptions: {
+    clear: "All Launches",
+    [[null]]: "Upcoming Launches",
+    true: "Successful Launches",
+    false: "Failed Launches",
+  },
+};
 
 export const LaunchDetailsReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case GET_LAUNCH_DETAILS_SUCCESS:
-            return {
-                ...state,
-                loading: true,
-                data: action.payload
-            }
-        case GET_LAUNCH_DETAILS_FAILURE:
-            return{
-                ...state,
-                loading: false,
-                data: '',
-                error: action.payload
-            }
-        default:
-            return state
-    }
-}
+  switch (action.type) {
+    case GET_LAUNCH_DETAILS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        data: action.payload,
+      };
+    case GET_LAUNCH_DETAILS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        data: "",
+        error: action.payload,
+      };
+    case GET_LAUNCH_FILTER_SUCCESS:
+      return {
+        ...state,
+        // loading: false,
+        launchFilter: action.payload,
+      };
+    case GET_DATE_FILTER_SUCCESS:
+      return {
+        ...state,
+        // loading: false,
+        dateFilter: action.payload,
+      };
+    default:
+      return state;
+  }
+};
