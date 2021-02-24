@@ -71,6 +71,15 @@ export default function DateRange() {
   useEffect(() => {
     if (queryValues.label != "null") {
       setCalenderLabel(queryValues.label);
+      dispatch(
+        getDateFilter([
+          {
+            startDate: queryValues.startdate,
+            endDate: queryValues.enddate,
+            label: queryValues.label,
+          },
+        ])
+      );
     } else {
       setCalenderLabel(calenderLabel);
     }
