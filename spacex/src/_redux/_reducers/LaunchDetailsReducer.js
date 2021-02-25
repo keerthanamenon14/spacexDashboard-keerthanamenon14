@@ -37,13 +37,11 @@ export const LaunchDetailsReducer = (state = initialState, action) => {
     case GET_LAUNCH_FILTER_SUCCESS:
       return {
         ...state,
-        // loading: false,
         launchFilter: action.payload,
       };
     case GET_DATE_FILTER_SUCCESS:
       return {
         ...state,
-        // loading: false,
         dateFilter: action.payload,
       };
     default:

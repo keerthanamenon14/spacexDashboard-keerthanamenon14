@@ -1,10 +1,8 @@
-import logo from "./logo.svg";
 import "./App.css";
 import { Provider } from "react-redux";
 import { store, persistor } from "./_redux/_store";
 import { PersistGate } from "redux-persist/integration/react";
 import Dashboard from "./_pages/Dashboard";
-import Routes from "./Routes.js";
 import { history } from "./_redux/_store/history";
 import { Router } from "react-router-dom";
 
