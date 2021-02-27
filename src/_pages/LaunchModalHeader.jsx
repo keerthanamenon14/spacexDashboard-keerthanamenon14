@@ -93,15 +93,17 @@ return(
             </Grid>
             </Grid>
             <Grid item>
-            {rowData.launch_success && !rowData.upcoming?  
-              <Chip  label="Success" className={classes.successChip}/>
-              :
-              !rowData.upcoming && rowData.launch_success !== 'true' && rowData.launch_success!== 'null'?
-              <Chip  label="Failure"  className={classes.failureChip}/>
-              :
-              rowData.upcoming &&
-              <Chip  label="Upcoming"  className={classes.upcomingChip}/>
-              } 
+            {rowData.launch_success && !rowData.upcoming ? (
+            <Chip label="Success" className={classes.successChip} />
+             ) : !rowData.upcoming &&
+            rowData.launch_success != true &&
+            rowData.launch_success != null ? (
+            <Chip label="Failure" className={classes.failureChip} />
+             ) : (
+            rowData.launch_success == null && (
+              <Chip label="Upcoming" className={classes.upcomingChip} />
+            )
+             )}
             </Grid>
             </Grid>
         </Grid>
